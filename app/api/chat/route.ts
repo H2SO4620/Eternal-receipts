@@ -16,14 +16,17 @@ export async function POST(req: NextRequest) {
     const { messages, ownerAddress } = await req.json();
     const lastMessage = messages[messages.length - 1]?.content ?? "";
 
-    const memoryResults = await queryReceiptMemory(lastMessage, 8);
-
-    const context =
-      memoryResults.length > 0
-        ? `\n\nRelevant receipts from the user's history:\n${memoryResults
-            .map((r, i) => `${i + 1}. ${r.content}`)
-            .join("\n")}`
-        : "\n\nNo relevant receipts found in Walrus Memory.";
+    let context = "\n\nNo receipt history available.";
+    try {
+      const memoryResults = await queryReceiptMemory(lastMessage, 8);
+      if (memoryResults.length > 0) {
+        context = `\n\nRelevant receipts from the user's history:\n${memoryResults
+          .map((r, i) => `${i + 1}. ${r.content}`)
+          .join("\n")}`;
+      }
+    } catch (memErr) {
+      console.warn("Walrus Memory unavailable (non-fatal):", memErr);
+    }
 
     const systemPrompt = `You are EternalReceipts AI, a helpful assistant that answers questions about the user's purchase history.
 
