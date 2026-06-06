@@ -42,8 +42,12 @@ ${context}`;
       )
       .join("\n");
 
+    const model = process.env.AI_MODEL ?? "google/gemini-3.5-flash";
+    console.log("Using model:", model);
+    console.log("OpenRouter key set:", !!process.env.OPENROUTER_API_KEY);
+
     const { text } = await generateText({
-      model: openrouter(process.env.AI_MODEL ?? "google/gemini-3.5-flash"),
+      model: openrouter(model),
       prompt: `${systemPrompt}\n\nConversation:\n${conversationHistory}\n\nAssistant:`,
     });
 
