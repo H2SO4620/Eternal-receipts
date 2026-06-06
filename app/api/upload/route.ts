@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { uploadToWalrus, sha256Hex } from "@/lib/walrus";
+import { sha256Hex } from "@/lib/walrus";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -25,18 +25,42 @@ export async function POST(req: NextRequest) {
 
     const bytes = new Uint8Array(await file.arrayBuffer());
     const contentHash = await sha256Hex(bytes);
-
-    // Upload to Walrus
-    const result = await uploadToWalrus(bytes, file.type, 1);
-
-    // Also return base64 so AI can parse immediately without waiting for Walrus certification
     const base64 = Buffer.from(bytes).toString("base64");
 
+    // Upload to Walrus
+    const PUBLISHER = process.env.WALRUS_PUBLISHER_URL;
+    if (!PUBLISHER) {
+      throw new Error("WALRUS_PUBLISHER_URL not configured");
+    }
+
+    const walrusRes = await fetch(`${PUBLISHER}/v1/blobs?epochs=1`, {
+      method: "PUT",
+      headers: { "Content-Type": file.type },
+      body: bytes,
+      signal: AbortSignal.timeout(45000), // 45s timeout
+    });
+
+    if (!walrusRes.ok) {
+      const err = await walrusRes.text();
+      throw new Error(`Walrus upload failed: ${walrusRes.status} ${err}`);
+    }
+
+    const data = await walrusRes.json();
+    console.log("Walrus response:", JSON.stringify(data));
+
+    const blobId =
+      data.newlyCreated?.blobObject?.blobId ??
+      data.alreadyCertified?.blobObject?.blobId ??
+      data.newlyCreated?.blobId ??
+      data.alreadyCertified?.blobId ??
+      data.blobId;
+
+    if (!blobId) throw new Error("No blob ID in Walrus response: " + JSON.stringify(data));
+
     return NextResponse.json({
-      blob_id: result.blob_id,
+      blob_id: blobId,
       content_hash: contentHash,
-      size: result.size,
-      end_epoch: result.end_epoch,
+      size: bytes.length,
       base64,
       mime_type: file.type,
     });
