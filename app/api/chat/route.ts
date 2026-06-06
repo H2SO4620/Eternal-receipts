@@ -35,10 +35,16 @@ Today's date: ${new Date().toISOString().split("T")[0]}
 User wallet: ${ownerAddress ?? "not connected"}
 ${context}`;
 
+    // Convert messages to simple prompt format
+    const conversationHistory = messages
+      .map((m: { role: string; content: string }) =>
+        `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`
+      )
+      .join("\n");
+
     const { text } = await generateText({
       model: openrouter(process.env.AI_MODEL ?? "google/gemini-3.5-flash"),
-      system: systemPrompt,
-      messages,
+      prompt: `${systemPrompt}\n\nConversation:\n${conversationHistory}\n\nAssistant:`,
     });
 
     return NextResponse.json({ text });
