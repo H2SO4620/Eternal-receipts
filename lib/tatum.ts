@@ -1,4 +1,5 @@
 import { SuiClient } from "@mysten/sui/client";
+// @ts-ignore - use dapp-kit's bundled version to avoid version mismatch
 import { Transaction } from "@mysten/sui/transactions";
 
 const TATUM_RPC = process.env.NEXT_PUBLIC_TATUM_RPC!;

@@ -84,7 +84,6 @@ export function UploadZone({ onSuccess }: UploadZoneProps) {
         try {
           result = await signAndExecute({
             transaction: tx,
-            options: { showEffects: true, showObjectChanges: true },
           });
         } catch (mintErr: any) {
           console.error("Mint error:", mintErr);

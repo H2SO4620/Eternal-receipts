@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   try {
     const objects = await getOwnedReceipts(address);
 
-    const receipts: StoredReceipt[] = objects
+    const receipts = objects
       .map((obj) => {
         const content = obj.data?.content;
         if (content?.dataType !== "moveObject") return null;
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
           version: Number(fields.version),
         } satisfies StoredReceipt;
       })
-      .filter((r): r is StoredReceipt => r !== null);
+      .filter((r): r is NonNullable<typeof r> => r !== null) as StoredReceipt[];
 
     return NextResponse.json({ receipts });
   } catch (err) {

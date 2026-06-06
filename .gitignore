@@ -42,3 +42,4 @@ next-env.d.ts
 
 # Move build artifacts
 move/eternal_receipts/build/
+.vercel

@@ -59,7 +59,7 @@ export function SpendingCharts({ stats }: Props) {
                 borderRadius: "8px",
                 color: "#e5e7eb",
               }}
-              formatter={(v: number) => [`$${v}`, "Spent"]}
+              formatter={(v: unknown) => [`$${v}`, "Spent"]}
             />
             <Bar dataKey="amount" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
           </BarChart>
@@ -90,7 +90,7 @@ export function SpendingCharts({ stats }: Props) {
                 borderRadius: "8px",
                 color: "#e5e7eb",
               }}
-              formatter={(v: number) => [`$${v}`, "Spent"]}
+              formatter={(v: unknown) => [`$${v}`, "Spent"]}
             />
             <Legend
               formatter={(value) => (

@@ -35,11 +35,10 @@ User wallet: ${ownerAddress ?? "not connected"}
 ${context}`;
 
   const result = streamText({
-    model: openrouter(process.env.AI_MODEL ?? "google/gemini-flash-1.5"),
+    model: openrouter(process.env.AI_MODEL ?? "google/gemini-3.5-flash"),
     system: systemPrompt,
     messages,
-    maxTokens: 1024,
   });
 
-  return result.toDataStreamResponse();
+  return result.toTextStreamResponse();
 }

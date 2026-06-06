@@ -15,7 +15,7 @@ export async function uploadToWalrus(
   const res = await fetch(`${PUBLISHER}/v1/blobs?epochs=1`, {
     method: "PUT",
     headers: { "Content-Type": mimeType },
-    body: file,
+    body: file as unknown as BodyInit,
   });
 
   if (!res.ok) {

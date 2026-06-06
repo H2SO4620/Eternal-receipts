@@ -1,9 +1,10 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { Send, Bot, Loader2 } from "lucide-react";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 const SUGGESTIONS = [
   "Show all electronics purchases",
@@ -15,11 +16,16 @@ const SUGGESTIONS = [
 export function AIChat() {
   const account = useCurrentAccount();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [inputValue, setInputValue] = useState("");
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: "/api/chat",
-    body: { ownerAddress: account?.address },
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({
+      api: "/api/chat",
+      body: { ownerAddress: account?.address },
+    }),
   });
+
+  const isLoading = status === "streaming" || status === "submitted";
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -27,6 +33,17 @@ export function AIChat() {
       behavior: "smooth",
     });
   }, [messages]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputValue.trim() || isLoading) return;
+    sendMessage({ text: inputValue });
+    setInputValue("");
+  };
+
+  const handleSuggestion = (s: string) => {
+    sendMessage({ text: s });
+  };
 
   return (
     <div className="flex flex-col h-[500px] bg-gray-900/60 border border-gray-700/50 rounded-2xl overflow-hidden">
@@ -46,11 +63,7 @@ export function AIChat() {
               {SUGGESTIONS.map((s) => (
                 <button
                   key={s}
-                  onClick={() =>
-                    handleInputChange({
-                      target: { value: s },
-                    } as React.ChangeEvent<HTMLInputElement>)
-                  }
+                  onClick={() => handleSuggestion(s)}
                   className="text-xs bg-violet-900/40 border border-violet-700/40 text-violet-300 rounded-full px-3 py-1.5 hover:bg-violet-800/40 transition-colors"
                 >
                   {s}
@@ -72,7 +85,9 @@ export function AIChat() {
                   : "bg-gray-800/80 text-gray-200 rounded-bl-sm"
               }`}
             >
-              {m.content}
+              {m.parts?.map((part, i) =>
+                part.type === "text" ? <span key={i}>{part.text}</span> : null
+              )}
             </div>
           </div>
         ))}
@@ -88,14 +103,14 @@ export function AIChat() {
 
       <form onSubmit={handleSubmit} className="p-3 border-t border-gray-700/50 flex gap-2">
         <input
-          value={input}
-          onChange={handleInputChange}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
           placeholder="Ask about your receipts..."
           className="flex-1 bg-gray-800/60 border border-gray-600/40 rounded-xl px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-violet-500/60"
         />
         <button
           type="submit"
-          disabled={!input.trim() || isLoading}
+          disabled={!inputValue.trim() || isLoading}
           className="p-2 bg-violet-600 hover:bg-violet-700 disabled:opacity-40 rounded-xl transition-colors"
         >
           <Send size={14} className="text-white" />
