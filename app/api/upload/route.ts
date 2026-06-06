@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       throw new Error("WALRUS_PUBLISHER_URL not configured");
     }
 
-    const walrusRes = await fetch(`${PUBLISHER}/v1/blobs?epochs=100`, {
+    const walrusRes = await fetch(`${PUBLISHER}/v1/blobs?epochs=1`, {
       method: "PUT",
       headers: { "Content-Type": file.type },
       body: bytes,
