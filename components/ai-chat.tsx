@@ -1,10 +1,13 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { Send, Bot, Loader2 } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
+
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
 
 const SUGGESTIONS = [
   "Show all electronics purchases",
@@ -16,16 +19,9 @@ const SUGGESTIONS = [
 export function AIChat() {
   const account = useCurrentAccount();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
-
-  const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/chat",
-      body: { ownerAddress: account?.address },
-    }),
-  });
-
-  const isLoading = status === "streaming" || status === "submitted";
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -34,15 +30,37 @@ export function AIChat() {
     });
   }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputValue.trim() || isLoading) return;
-    sendMessage({ text: inputValue });
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || isLoading) return;
+
+    const userMessage: Message = { role: "user", content: text };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInputValue("");
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: newMessages,
+          ownerAddress: account?.address,
+        }),
+      });
+
+      const data = await res.json();
+      setMessages([...newMessages, { role: "assistant", content: data.text ?? "Sorry, I couldn't process that." }]);
+    } catch {
+      setMessages([...newMessages, { role: "assistant", content: "Error connecting to AI. Please try again." }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSuggestion = (s: string) => {
-    sendMessage({ text: s });
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendMessage(inputValue);
   };
 
   return (
@@ -63,7 +81,7 @@ export function AIChat() {
               {SUGGESTIONS.map((s) => (
                 <button
                   key={s}
-                  onClick={() => handleSuggestion(s)}
+                  onClick={() => sendMessage(s)}
                   className="text-xs bg-violet-900/40 border border-violet-700/40 text-violet-300 rounded-full px-3 py-1.5 hover:bg-violet-800/40 transition-colors"
                 >
                   {s}
@@ -73,11 +91,8 @@ export function AIChat() {
           </div>
         )}
 
-        {messages.map((m) => (
-          <div
-            key={m.id}
-            className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
-          >
+        {messages.map((m, i) => (
+          <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                 m.role === "user"
@@ -85,9 +100,7 @@ export function AIChat() {
                   : "bg-gray-800/80 text-gray-200 rounded-bl-sm"
               }`}
             >
-              {m.parts?.map((part, i) =>
-                part.type === "text" ? <span key={i}>{part.text}</span> : null
-              )}
+              {m.content}
             </div>
           </div>
         ))}
