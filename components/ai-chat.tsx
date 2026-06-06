@@ -50,9 +50,16 @@ export function AIChat() {
       });
 
       const data = await res.json();
-      setMessages([...newMessages, { role: "assistant", content: data.text ?? "Sorry, I couldn't process that." }]);
-    } catch {
-      setMessages([...newMessages, { role: "assistant", content: "Error connecting to AI. Please try again." }]);
+      console.log("Chat response:", data);
+
+      if (!res.ok) {
+        setMessages([...newMessages, { role: "assistant", content: `Error: ${data.error ?? res.status}` }]);
+      } else {
+        setMessages([...newMessages, { role: "assistant", content: data.text ?? "No response from AI." }]);
+      }
+    } catch (err) {
+      console.error("Chat fetch error:", err);
+      setMessages([...newMessages, { role: "assistant", content: "Network error. Please try again." }]);
     } finally {
       setIsLoading(false);
     }
