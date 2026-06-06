@@ -12,7 +12,7 @@ export async function uploadToWalrus(
   mimeType: string,
   epochs: number = 1,
 ): Promise<WalrusUploadResult> {
-  const res = await fetch(`${PUBLISHER}/v1/blobs?epochs=1`, {
+  const res = await fetch(`${PUBLISHER}/v1/blobs?epochs=100`, {
     method: "PUT",
     headers: { "Content-Type": mimeType },
     body: file as unknown as BodyInit,

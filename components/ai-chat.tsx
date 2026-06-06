@@ -77,7 +77,7 @@ export function AIChat() {
           <Bot size={16} className="text-violet-300" />
         </div>
         <span className="text-sm font-medium text-gray-200">AI Receipt Assistant</span>
-        <span className="ml-auto text-xs text-gray-500">Powered by Walrus Memory</span>
+        <span className="ml-auto text-xs text-gray-500">Built on Walrus + Sui</span>
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
