@@ -187,18 +187,113 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800/50 py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Receipt size={16} className="text-violet-400" />
-            <span className="text-gray-400 text-sm">EternalReceipts — Tatum x Walrus Hackathon 2026</span>
+      <footer className="border-t border-gray-800/50 bg-gray-950">
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          {/* Top — 4 columns */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+            {/* Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-violet-700/40 rounded-lg">
+                  <Receipt size={16} className="text-violet-300" />
+                </div>
+                <span className="font-bold text-white">EternalReceipts</span>
+              </div>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Your receipts, permanently stored and truly owned on the Sui blockchain.
+              </p>
+            </div>
+
+            {/* Product */}
+            <div>
+              <h4 className="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-3">
+                Product
+              </h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/upload" className="text-gray-400 hover:text-violet-300 transition-colors">Upload</Link></li>
+                <li><Link href="/dashboard" className="text-gray-400 hover:text-violet-300 transition-colors">Dashboard</Link></li>
+                <li>
+                  <a
+                    href="https://github.com/H2SO4620/Eternal-receipts"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-violet-300 transition-colors"
+                  >
+                    GitHub
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Built on */}
+            <div>
+              <h4 className="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-3">
+                Built on
+              </h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a href="https://sui.io" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-violet-300 transition-colors">
+                    Sui Network
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.walrus.xyz" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-violet-300 transition-colors">
+                    Walrus Storage
+                  </a>
+                </li>
+                <li>
+                  <a href="https://tatum.io" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-violet-300 transition-colors">
+                    Tatum RPC
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* On-chain proof */}
+            <div>
+              <h4 className="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-3">
+                On-chain
+              </h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a
+                    href="https://suiexplorer.com/object/0xa6609a0be8baa03b8fe626aff3f6634904c94d9be9afe2c2332e8e2fc384de38?network=mainnet"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-violet-300 transition-colors inline-flex items-center gap-1"
+                  >
+                    View Contract
+                  </a>
+                </li>
+                <li className="text-xs text-gray-600 font-mono break-all leading-relaxed pt-1">
+                  Package: 0xa660...4de38
+                </li>
+                <li className="text-xs text-gray-600">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                    Sui Mainnet
+                  </span>
+                </li>
+              </ul>
+            </div>
           </div>
-          <div className="flex items-center gap-4 text-xs text-gray-500">
-            <span>Sui Mainnet</span>
-            <span>·</span>
-            <span>Walrus Storage</span>
-            <span>·</span>
-            <span>Tatum RPC</span>
+
+          {/* Bottom bar */}
+          <div className="pt-8 border-t border-gray-800/50 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-gray-500">
+              © 2026 EternalReceipts · Built for the Tatum x Walrus Hackathon
+            </p>
+            <div className="flex items-center gap-4 text-xs text-gray-500">
+              <span className="inline-flex items-center gap-1.5">
+                <Database size={11} className="text-violet-400" /> Walrus
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Shield size={11} className="text-violet-400" /> Sui
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Sparkles size={11} className="text-violet-400" /> AI-Powered
+              </span>
+            </div>
           </div>
         </div>
       </footer>
